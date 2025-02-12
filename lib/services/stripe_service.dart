@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_local_variable
 
 import 'package:dio/dio.dart';
 import 'package:flutter_stripe_app/constants/api_keys.dart';
@@ -7,6 +7,8 @@ class StripeService {
   StripeService._();
 
   static final StripeService _instance = StripeService._();
+
+    static StripeService get instance => _instance;
 
   Future<void> makePayment() async {
     try {
@@ -31,7 +33,7 @@ class StripeService {
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
           headers: {
-            "Authoriation": "Bearer $stripeSecretKey",
+            "Authorization": "Bearer $stripeSecretKey",
             "Content-Type": "application/x-www-form-urlencoded"
           },
         ),
