@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe_app/constants/api_keys.dart';
 import 'package:flutter_stripe_app/views/home_page.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
-void main() {
+void main() async{
+  await _setUp();
   runApp(const MyApp());
+}
+
+Future<void> _setUp() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = stripePublishableKey;
 }
 
 class MyApp extends StatelessWidget {

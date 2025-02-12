@@ -2,17 +2,29 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter_stripe_app/constants/api_keys.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 class StripeService {
   StripeService._();
 
   static final StripeService _instance = StripeService._();
 
-    static StripeService get instance => _instance;
+  static StripeService get instance => _instance;
 
   Future<void> makePayment() async {
     try {
-      String? result = await _createPaymentIntent(10, "USD");
+      String? paymentIntentClientSecret = await _createPaymentIntent(10, "USD");
+
+      if (paymentIntentClientSecret == null) return null;
+
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: paymentIntentClientSecret,
+          merchantDisplayName: "Akshay Mohan",
+        ),
+      );
+
+      await _processPayment();
     } catch (e) {
       print(e);
     }
@@ -37,17 +49,24 @@ class StripeService {
             "Content-Type": "application/x-www-form-urlencoded"
           },
         ),
-      );  
+      );
 
-      if(response.data != null) {
-        print(response.data);
-       return "";
+      if (response.data != null) {
+        return response.data["client_secret"];
       }
-       return null;
+      return null;
     } catch (e) {
       print(e);
     }
     return null;
+  }
+
+  Future<void> _processPayment() async {
+    try {
+      await Stripe.instance.presentPaymentSheet();
+    } catch (e) {
+      print(e);
+    }
   }
 
   String _calculateAmount(int amount) {
